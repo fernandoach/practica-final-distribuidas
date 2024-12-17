@@ -1,6 +1,8 @@
 import express from 'express'
 import { addNewUsuario } from '../services/usuarios/addNewUsuario.js'
 import bcrypt from 'bcrypt'
+import { getUserCredentials } from '../services/usuarios/getUserCrentials.js'
+import jwt from 'jsonwebtoken'
 
 const authRoutes = express.Router()
 
@@ -24,6 +26,29 @@ authRoutes.post('/register', async (req, res) => {
     console.log(error)
     return res.json(error.message)
   }
+})
+
+authRoutes.get('/login', (req, res) => {
+  return res.render('auth/login.ejs')
+})
+
+authRoutes.post('/login', async (req, res) => {
+  const { usuario, passwd } = req.body
+  const query = await getUserCredentials(usuario)
+  if (query.length === 0) {
+    return res.json('Usuario y/o contraseña invalidos')
+  }
+  const comparePasswd = await bcrypt.compare(passwd, query[0].passwd)
+
+  if (comparePasswd) {
+    // logica de jwt y cookies
+    const jtwPassword = 'secret'
+    const token = jwt.sign({ usuario }, jtwPassword, { expiresIn: '1h' })
+    res.cookie('t', token, { httpOnly: true })
+    return res.redirect('/')
+  }
+
+  return res.json('Usuario y/o contraseña invalidos')
 })
 
 export { authRoutes }
