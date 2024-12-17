@@ -41,7 +41,6 @@ authRoutes.post('/login', async (req, res) => {
   const comparePasswd = await bcrypt.compare(passwd, query[0].passwd)
 
   if (comparePasswd) {
-    // logica de jwt y cookies
     const jtwPassword = 'secret'
     const token = jwt.sign({ usuario }, jtwPassword, { expiresIn: '1h' })
     res.cookie('t', token, { httpOnly: true })
