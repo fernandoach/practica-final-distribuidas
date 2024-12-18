@@ -43,8 +43,8 @@ authRoutes.post('/login', async (req, res) => {
   if (comparePasswd) {
     const jtwPassword = 'secret'
     const token = jwt.sign({ usuario }, jtwPassword, { expiresIn: '1h' })
-    res.cookie('t', token, { httpOnly: true })
-    return res.redirect('/')
+    res.cookie('jwt', token, { httpOnly: true })
+    return res.redirect('/products')
   }
 
   return res.json('Usuario y/o contraseña invalidos')
